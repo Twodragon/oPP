@@ -1,0 +1,50 @@
+version: "2"
+services:
+  consumer:
+    build:
+      dockerfile: Dockerfile
+      context: ./consumer
+    command: python3 /var/code/consumer/main.py
+    volumes:
+      - ./consumer:/var/code/consumer
+    working_dir: /var/code/consumer
+    depends_on:
+      - db
+      - rabbit
+    networks:
+      - default
+
+
+  producer:
+    build:
+      dockerfile: Dockerfile
+      context: ./producer
+    command: python3 /var/code/producer/main.py
+    volumes:
+      - ./producer:/var/code/producer
+    working_dir: /var/code/producer
+    depends_on:
+      - db
+      - rabbit
+    networks:
+      - default
+
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=db
+      - POSTGRES_USER=db
+      - POSTGRES_NAME=db
+    networks:
+      - default
+
+  rabbit:
+    image: rabbitmq
+    ports:
+      - 5672:5672
+    networks:
+      - default
+
